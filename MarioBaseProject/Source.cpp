@@ -15,6 +15,7 @@ bool InitSDL();
 void CloseSDL();
 bool Update();
 void Render();
+double AngleChange = 0;
 SDL_Texture* LoadTextureFromFile(string path);
 
 bool InitSDL()
@@ -102,10 +103,30 @@ bool Update()
     case SDL_QUIT:
         return true;
         break;
+
+        // Rotate the image when pressing 'E'
+    case SDL_KEYDOWN:
+        if (e.key.keysym.sym == SDLK_e)
+        {
+            AngleChange += 10.0; // Increase angle by 10 degrees
+        }
+        if (e.key.keysym.sym == SDLK_q)
+        {
+            SDL_Quit();
+        }
+        break;
+    case SDL_MOUSEBUTTONDOWN:
+        if (e.button.button == SDL_BUTTON_RIGHT)
+        {
+            cout << "Clicked";
+            SDL_Quit();
+        }
     }
+    
 
     return false;
 }
+
 
 void Render()
 {
@@ -117,7 +138,7 @@ void Render()
     SDL_Rect renderLocation = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
     // Render to screen
-    SDL_RenderCopy(g_renderer, g_texture, NULL, &renderLocation);
+    SDL_RenderCopyEx(g_renderer, g_texture, NULL, &renderLocation, AngleChange, NULL, SDL_FLIP_NONE);
 
     // Update the screen
     SDL_RenderPresent(g_renderer);
