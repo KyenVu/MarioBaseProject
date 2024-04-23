@@ -17,6 +17,7 @@ bool Update();
 void Render();
 double AngleChange = 0;
 SDL_Texture* LoadTextureFromFile(string path);
+SDL_RendererFlip _flip;
 
 bool InitSDL()
 {
@@ -113,6 +114,10 @@ bool Update()
         if (e.key.keysym.sym == SDLK_q)
         {
             SDL_Quit();
+        }
+        if (e.key.keysym.sym == SDLK_f)
+        {
+            _flip = SDL_FLIP_HORIZONTAL;
         }
         break;
     case SDL_MOUSEBUTTONDOWN:
