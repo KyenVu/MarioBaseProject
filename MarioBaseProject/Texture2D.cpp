@@ -44,6 +44,8 @@ bool Texture2D::LoadFromFile(string path)
     if (p_surface == nullptr)
     {
         cout << "Unable to load image " << path << ". SDL_image Error: " << IMG_GetError();
+        // colour key the image to be transparent
+        SDL_SetColorKey(p_surface, SDL_TRUE, SDL_MapRGB(p_surface -> format, 0, 0XFF, 0XFF));
     }
     else
     {
