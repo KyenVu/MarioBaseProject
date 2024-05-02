@@ -1,4 +1,8 @@
 #pragma once
+#ifdef GameScreenLevel1.h
+#define GameScreenLevel1.h
+#endif // GameScreenLevel1.h
+
 #include "GameScreen.h"
 #include "Commons.h"
 #include "Texture2D.h"

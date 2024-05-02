@@ -1,4 +1,8 @@
 #pragma once
+#ifdef _GameScreenManager.h
+#define _GameScreenManager_h
+#endif // _GameScreenManager.h
+
 #include <SDL.h>
 #include "GameScreen.h"
 #include "GameScreenLevel1.h"

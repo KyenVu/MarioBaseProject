@@ -7,38 +7,39 @@
 #include "constants.h"
 #include "GameScreenManager.h"
 
+using namespace std;
+
 SDL_Window* g_window = nullptr;
 SDL_Renderer* g_renderer = nullptr;
 GameScreenManager* game_screen_manager = nullptr;
 Uint32 g_old_time;
 
-bool InitSDL() 
+bool InitSDL()
 {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) 
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
-        std::cout << "SDL did not initialise. Error: " << SDL_GetError();
+        cout << "SDL did not initialise. Error: " << SDL_GetError();
         return false;
     }
 
-    g_window = SDL_CreateWindow("Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    if (g_window == nullptr) 
+    g_window = SDL_CreateWindow("Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE );
+    if (g_window == nullptr)
     {
-        std::cout << "Window was not created. Error : " << SDL_GetError();
+        cout << "Window was not created. Error : " << SDL_GetError();
         return false;
     }
 
     g_renderer = SDL_CreateRenderer(g_window, -1, SDL_RENDERER_ACCELERATED);
-    if (g_renderer == nullptr) 
+    if (g_renderer == nullptr)
     {
-        std::cout << "Renderer could not be created. Error: " << SDL_GetError();
+        cout << "Renderer could not be created. Error: " << SDL_GetError();
         return false;
     }
-   
 
     return true;
 }
 
-void CloseSDL() 
+void CloseSDL()
 {
     // destroy game screen manager
     delete game_screen_manager;
@@ -53,24 +54,24 @@ void CloseSDL()
     SDL_Quit();
 }
 
-void Render() 
+void Render()
 {
-    //Clear the screen
+    // Clear the screen
     SDL_SetRenderDrawColor(g_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(g_renderer);
 
     game_screen_manager->Render();
 
-    //Update the screen
+    // Update the screen
     SDL_RenderPresent(g_renderer);
 }
 
-bool Update() 
+bool Update()
 {
     SDL_Event e;
     SDL_PollEvent(&e);
 
-    if (e.type == SDL_QUIT) 
+    if (e.type == SDL_QUIT)
     {
         return true;
     }
@@ -84,23 +85,24 @@ bool Update()
     return false;
 }
 
-int main(int argc, char* args[]) 
+int main(int argc, char* args[])
 {
-    if (InitSDL()) 
+    if (InitSDL())
     {
-        // Khởi tạo GameScreenManager
         game_screen_manager = new GameScreenManager(g_renderer, SCREEN_LEVEL1);
         // set the time
         g_old_time = SDL_GetTicks();
+
+        bool quit = false;
+        while (!quit)
+        {
+            Render();
+            quit = Update();
+        }
+
+        CloseSDL();
         return 0;
     }
 
-    bool quit = false;
-    while (!quit) {
-        Render();
-        quit = Update();
-    }
-
-    CloseSDL();
-    return 0;
+    return -1; // initialization failed
 }

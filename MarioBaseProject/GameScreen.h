@@ -1,6 +1,7 @@
 #pragma once
 #ifndef _GameScreen.h
-#endif // !_GameScreen.h
+#define _GameScreen_h
+#endif // _GameScreen.h
 
 #include <SDL.h>
 class GameScreen 
