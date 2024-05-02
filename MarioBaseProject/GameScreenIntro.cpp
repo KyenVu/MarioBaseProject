@@ -1,20 +1,16 @@
 #include "GameScreenIntro.h"
-#include "Texture2D.h"
-#include "Commons.h"
-#include "GameScreenManager.h"
+#include "GameScreenManager.h" // Include the header file where SCREEN_INTRO is defined
 #include <iostream>
+
 using namespace std;
 
 GameScreenIntro::GameScreenIntro(SDL_Renderer* renderer) : GameScreen(renderer)
 {
-    if (!SetUpLevel()) {
-        cout << "Failed to set up intro screen!" << endl;
-    }
+    SetUpLevel();
 }
 
 GameScreenIntro::~GameScreenIntro()
 {
-    // Release resources
     delete m_background_texture;
     m_background_texture = nullptr;
 }
@@ -22,28 +18,27 @@ GameScreenIntro::~GameScreenIntro()
 void GameScreenIntro::Render()
 {
     // Draw background
-    if (m_background_texture != nullptr) {
-        m_background_texture->Render(Vector2D(), SDL_FLIP_NONE);
-    }
+    m_background_texture->Render(Vector2D(), SDL_FLIP_NONE);
 }
 
 void GameScreenIntro::Update(float deltaTime, SDL_Event e)
 {
     // Check for key press event to switch screens
     if (e.type == SDL_KEYDOWN) {
-        if (e.key.keysym.sym == SDLK_RETURN) {
+        if (e.key.keysym.sym == SDLK_RETURN)
+        {
             // Switch to level screen
-            GameScreenManager->ChangeScreen(SCREENS::SCREEN_INTRO);
+            m_manager->ChangeScreen(SCREEN_LEVEL1);
         }
     }
 }
 
 bool GameScreenIntro::SetUpLevel()
 {
-    // Create background texture
+    //create background texture
     m_background_texture = new Texture2D(m_renderer);
-    if (!m_background_texture->LoadFromFile("Images/title_background.bmp")) {
-        cout << "Failed to load intro screen background texture!" << endl;
+    if (!m_background_texture->LoadFromFile("Images/garnacho.bmp")) {
+        cout << "Failed to load background texture!" << endl;
         return false;
     }
 

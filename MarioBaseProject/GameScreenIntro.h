@@ -4,6 +4,7 @@
 #endif // _GameScreenIntro_h
 
 #include "GameScreen.h"
+#include "Texture2D.h"
 
 class GameScreenIntro : public GameScreen
 {
@@ -16,6 +17,8 @@ public:
 
 private:
 	Texture2D* m_background_texture;
+	GameScreenManager* m_manager;
+	bool SetUpLevel();
 };
 
 
