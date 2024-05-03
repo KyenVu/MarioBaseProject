@@ -17,21 +17,21 @@ Uint32 g_old_time;
 bool InitSDL() {
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        cerr << "SDL could not initialize! SDL Error: " << SDL_GetError() << endl;
+        cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << endl;
         return false;
     }
 
     // Create window
     g_window = SDL_CreateWindow("Mario Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
     if (g_window == nullptr) {
-        cerr << "Window could not be created! SDL Error: " << SDL_GetError() << endl;
+        cout << "Window could not be created! SDL Error: " << SDL_GetError() << endl;
         return false;
     }
 
     // Create renderer
     g_renderer = SDL_CreateRenderer(g_window, -1, SDL_RENDERER_ACCELERATED);
     if (g_renderer == nullptr) {
-        cerr << "Renderer could not be created! SDL Error: " << SDL_GetError() << endl;
+        cout << "Renderer could not be created! SDL Error: " << SDL_GetError() << endl;
         return false;
     }
 
