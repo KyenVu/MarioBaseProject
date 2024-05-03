@@ -1,5 +1,5 @@
 #include "GameScreenIntro.h"
-#include "GameScreenManager.h" // Include the header file where SCREEN_INTRO is defined
+#include "GameScreenManager.h"
 #include <iostream>
 
 using namespace std;
@@ -28,7 +28,7 @@ void GameScreenIntro::Update(float deltaTime, SDL_Event e)
         if (e.key.keysym.sym == SDLK_RETURN)
         {
             // Switch to level screen
-            m_manager->ChangeScreen(SCREEN_LEVEL1);
+            m_manager->ChangeScreen(SCREEN_INTRO);
         }
     }
 }
