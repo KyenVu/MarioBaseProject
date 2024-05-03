@@ -1,10 +1,11 @@
 #include "GameScreenIntro.h"
 #include "GameScreenManager.h"
+#include "Texture2D.h"
 #include <iostream>
 
 using namespace std;
 
-GameScreenIntro::GameScreenIntro(SDL_Renderer* renderer) : GameScreen(renderer)
+GameScreenIntro::GameScreenIntro(SDL_Renderer* renderer, GameScreenManager* manager) : GameScreen(renderer), m_manager(manager)
 {
     SetUpLevel();
 }
@@ -28,7 +29,7 @@ void GameScreenIntro::Update(float deltaTime, SDL_Event e)
         if (e.key.keysym.sym == SDLK_RETURN)
         {
             // Switch to level screen
-            m_manager->ChangeScreen(SCREEN_INTRO);
+            m_manager->ChangeScreen(SCREEN_LEVEL1);
         }
     }
 }

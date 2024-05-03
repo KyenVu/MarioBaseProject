@@ -14,27 +14,29 @@ SDL_Renderer* g_renderer = nullptr;
 GameScreenManager* game_screen_manager = nullptr;
 Uint32 g_old_time;
 
-bool InitSDL()
-{
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        cout << "SDL did not initialise. Error: " << SDL_GetError();
+bool InitSDL() {
+    // Initialize SDL
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        cerr << "SDL could not initialize! SDL Error: " << SDL_GetError() << endl;
         return false;
     }
 
-    g_window = SDL_CreateWindow("Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE );
-    if (g_window == nullptr)
-    {
-        cout << "Window was not created. Error : " << SDL_GetError();
+    // Create window
+    g_window = SDL_CreateWindow("Mario Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
+    if (g_window == nullptr) {
+        cerr << "Window could not be created! SDL Error: " << SDL_GetError() << endl;
         return false;
     }
 
+    // Create renderer
     g_renderer = SDL_CreateRenderer(g_window, -1, SDL_RENDERER_ACCELERATED);
-    if (g_renderer == nullptr)
-    {
-        cout << "Renderer could not be created. Error: " << SDL_GetError();
+    if (g_renderer == nullptr) {
+        cerr << "Renderer could not be created! SDL Error: " << SDL_GetError() << endl;
         return false;
     }
+
+    // Set renderer color
+    SDL_SetRenderDrawColor(g_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
     return true;
 }
@@ -85,24 +87,36 @@ bool Update()
     return false;
 }
 
-int main(int argc, char* args[])
-{
-    if (InitSDL())
-    {
-        game_screen_manager = new GameScreenManager(g_renderer, SCREEN_LEVEL1);
-        // set the time
-        g_old_time = SDL_GetTicks();
-
-        bool quit = false;
-        while (!quit)
-        {
-            Render();
-            quit = Update();
-        }
-
-        CloseSDL();
-        return 0;
+int main(int argc, char* args[]) {
+    if (!InitSDL()) {
+        return -1;
     }
 
-    return -1; // initialization failed
+    // Create the GameScreenManager instance
+    game_screen_manager = new GameScreenManager(g_renderer, SCREEN_INTRO);
+
+    g_old_time = SDL_GetTicks();
+
+    // Main loop
+    bool quit = false;
+    SDL_Event e;
+    while (!quit) {
+        // Event handling
+        while (SDL_PollEvent(&e) != 0) {
+            if (e.type == SDL_QUIT) {
+                quit = true;
+            }
+        }
+
+        // Update and render
+        Update();
+        Render();
+    }
+
+    // Clean up
+    CloseSDL();
+    delete game_screen_manager;
+    game_screen_manager = nullptr;
+
+    return 0;
 }

@@ -1,6 +1,7 @@
 ﻿#include "GameScreenManager.h"
 #include "GameScreen.h"
 #include "GameScreenLevel1.h"
+#include "GameScreenIntro.h"
 #include <iostream>
 using namespace std;
 
@@ -46,6 +47,11 @@ void GameScreenManager::ChangeScreen(SCREENS new_screen)
         m_current_screen = (GameScreen*) tempScreen;
         tempScreen = nullptr;
         // add new screen
+        break;
+    case SCREEN_INTRO:
+        tempScreen = new GameScreenIntro(m_renderer, this);
+        m_current_screen = (GameScreen*)tempScreen;
+        tempScreen = nullptr;
         break;
     default:
         cout << "Invalid screen type!" << endl;
