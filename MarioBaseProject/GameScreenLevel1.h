@@ -7,7 +7,10 @@
 #include "Commons.h"
 #include "Texture2D.h"
 #include "GameScreenManager.h"
+#include "Character.h"
 
+
+class Character;
 class GameScreenLevel1 : public GameScreen
 {
 public:
@@ -19,6 +22,7 @@ public:
 
 private:
 	Texture2D* m_background_texture;
+	Character* my_character;
 	bool SetUpLevel();
 
 };

@@ -26,7 +26,8 @@ void GameScreenManager::Render()
 
 void GameScreenManager::Update(float deltaTime, SDL_Event e) 
 {
-    if (m_current_screen != nullptr) {
+    if (m_current_screen != nullptr) 
+    {
         m_current_screen->Update(deltaTime, e);
     }
 }
