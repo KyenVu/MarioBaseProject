@@ -7,6 +7,8 @@
 #include "Commons.h"
 #include "Texture2D.h"
 #include "GameScreenManager.h"
+#include "CharacterMario.h"
+#include "CharacterLuigi.h"
 #include "Character.h"
 
 
@@ -22,7 +24,8 @@ public:
 
 private:
 	Texture2D* m_background_texture;
-	Character* my_character;
+	CharacterMario* mario;
+	CharacterLuigi* luigi;
 	bool SetUpLevel();
 
 };

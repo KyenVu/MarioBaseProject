@@ -12,6 +12,8 @@ Character::Character(SDL_Renderer* renderer, string imagePath, Vector2D start_po
 
 	m_moving_left = false;
 	m_moving_right = false;
+
+	m_collision_radius = 15.0f;
 }
 
 Character::~Character()
@@ -33,26 +35,32 @@ void Character::Render()
 
 void Character::Update(float deltaTime, SDL_Event e)
 {
-	if (m_moving_left) 
+	if (m_jumping) 
 	{
-		MoveLeft(deltaTime);
+		m_position.y -= m_jump_force * deltaTime;
+		m_jump_force -= JUMP_FORCE_DECREMENT * deltaTime;
+		if (m_jump_force <= 0.0f) 
+		{
+			m_jumping = false;
+		}
 	}
-	else if (m_moving_right)
+	else 
 	{
-		MoveRight(deltaTime);
+		AddGravity(deltaTime);
 	}
+
 	switch (e.type)
 	{
 	case SDL_KEYDOWN:
 		switch (e.key.keysym.sym)
 		{
 		case SDLK_RIGHT:
+			cout << "Facing right" << endl;
 			m_moving_right = true;
 			break;
 		case SDLK_LEFT:
+			cout << "Facing left" << endl;
 			m_moving_left = true;
-			break;
-		default:
 			break;
 		}
 		break;
@@ -60,28 +68,40 @@ void Character::Update(float deltaTime, SDL_Event e)
 		switch (e.key.keysym.sym)
 		{
 		case SDLK_RIGHT:
+			cout << "Not facing right" << endl;
 			m_moving_right = false;
 			break;
 		case SDLK_LEFT:
+			cout << "Not facing left" << endl;
 			m_moving_left = false;
 			break;
-		default:
+		case SDLK_UP:
+			Jump();
 			break;
 		}
+
 		break;
+	}
+	if (m_moving_left)
+	{
+		MoveLeft(deltaTime);
+	}
+	else if (m_moving_right)
+	{
+		MoveRight(deltaTime);
 	}
 }
 
 void Character::MoveLeft(float deltaTime)
 {
-	m_position.x -= deltaTime * MOVEMENTSPEED;
 	m_facing_direction = FACING_LEFT;
+	m_position.x -= deltaTime * MOVEMENTSPEED;
 }
 
 void Character::MoveRight(float deltaTime)
 {
-	m_position.x += deltaTime * MOVEMENTSPEED;
 	m_facing_direction = FACING_RIGHT;
+	m_position.x += deltaTime * MOVEMENTSPEED;
 }
 
 void Character::SetPosition(Vector2D new_position)
@@ -89,7 +109,33 @@ void Character::SetPosition(Vector2D new_position)
 	m_position = new_position;
 }
 
+void Character::AddGravity(float deltaTime)
+{
+	if (m_position.y + m_texture->GetHeight() < SCREEN_HEIGHT)
+	{
+		m_position.y += GRAVITY * deltaTime;
+	}
+	else 
+	{
+		m_can_jump = true;
+	}
+}
+
+void Character::Jump()
+{
+	if (m_can_jump)
+	{
+		m_jump_force = INITIAL_JUMP_FORCE;
+		m_jumping = true;
+		m_can_jump = false;
+	}
+}
 Vector2D Character::GetPosition()
 {
 	return m_position;
+}
+
+float Character::GetCollisionRadius()
+{
+	return m_collision_radius;
 }
