@@ -3,6 +3,7 @@
 #include <iostream>
 #include "Commons.h"
 #include "constants.h"
+#include "Texture2D.h"
 
 using namespace std;
 
@@ -21,11 +22,17 @@ public:
 	float GetCollisionRadius();
 
 	Vector2D GetPosition();
+	inline Rect2D GetCollisionBox()
+	{
+		return Rect2D(m_position.x, m_position.y,
+		m_texture->GetWidth(), m_texture->GetHeight());
+	}
 
 protected:
 	SDL_Renderer* m_renderer;
 	Vector2D m_position;
 	Texture2D* m_texture;
+	FACING m_facing_direction;
 
 	bool m_jumping;
 	bool m_can_jump;
@@ -42,7 +49,7 @@ protected:
 	virtual void Jump();
 
 private:
-	FACING m_facing_direction;
+
 
 };
 

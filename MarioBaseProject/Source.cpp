@@ -105,20 +105,13 @@ int main(int argc, char* args[])
 
     // Main loop
     bool quit = false;
+
     SDL_Event e;
+
     while (!quit) 
     {
-        // Event handling
-        while (SDL_PollEvent(&e) != 0) 
-        {
-            if (e.type == SDL_QUIT) 
-            {
-                quit = true;
-            }
-        }
-
         // Update and render
-        Update();
+        quit = Update();
         Render();
     }
 

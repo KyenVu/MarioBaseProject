@@ -55,11 +55,9 @@ void Character::Update(float deltaTime, SDL_Event e)
 		switch (e.key.keysym.sym)
 		{
 		case SDLK_RIGHT:
-			cout << "Facing right" << endl;
 			m_moving_right = true;
 			break;
 		case SDLK_LEFT:
-			cout << "Facing left" << endl;
 			m_moving_left = true;
 			break;
 		}
@@ -68,11 +66,9 @@ void Character::Update(float deltaTime, SDL_Event e)
 		switch (e.key.keysym.sym)
 		{
 		case SDLK_RIGHT:
-			cout << "Not facing right" << endl;
 			m_moving_right = false;
 			break;
 		case SDLK_LEFT:
-			cout << "Not facing left" << endl;
 			m_moving_left = false;
 			break;
 		case SDLK_UP:
