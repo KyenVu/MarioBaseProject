@@ -1,8 +1,7 @@
 #include "CharacterMario.h"
 #include "Texture2D.h"
-CharacterMario::CharacterMario(SDL_Renderer* renderer, string imagePath, Vector2D start_Position) 
-    :Character(renderer, imagePath, start_Position)
-{}
+CharacterMario::CharacterMario(SDL_Renderer* renderer, string imagePath, Vector2D start_position, LevelMap* map)
+               :Character(renderer, imagePath, start_position, map) {}
 
 CharacterMario::~CharacterMario() {}
 

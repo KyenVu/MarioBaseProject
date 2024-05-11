@@ -1,8 +1,7 @@
 #include "CharacterLuigi.h"
 #include "Texture2D.h"
-CharacterLuigi::CharacterLuigi(SDL_Renderer* renderer, string imagePath, Vector2D start_Position)
-    :Character(renderer, imagePath, start_Position)
-{}
+CharacterLuigi::CharacterLuigi(SDL_Renderer* renderer, string imagePath, Vector2D start_position, LevelMap* map)
+	: Character(renderer, imagePath, start_position, map) {}
 
 CharacterLuigi::~CharacterLuigi() {}
 
@@ -19,7 +18,18 @@ void CharacterLuigi::Update(float deltaTime, SDL_Event e)
 	}
 	else
 	{
-		AddGravity(deltaTime);
+		//collision position variable
+		int centralX_position = (int)(m_position.x + (m_texture->GetWidth() * 0.5)) / TILE_WITDH;
+		int foot_position = (int)(m_position.y + (m_texture->GetHeight())) / TILE_HEIGHT;
+		if (m_current_level_map->GetTileAt(foot_position, centralX_position) == 0)
+		{
+			AddGravity(deltaTime);
+		}
+		else
+		{
+			//collided with ground so we can jump again
+			m_can_jump = true;
+		}
 	}
 
 	switch (e.type)
