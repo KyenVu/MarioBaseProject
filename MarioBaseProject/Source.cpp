@@ -1,110 +1,63 @@
-#include <SDL.h>
+﻿#include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
 #include <iostream>
+#include "Texture2D.h"
+#include "Commons.h"
 #include "constants.h"
+#include "GameScreenManager.h"
 
 using namespace std;
 
-// Globals
 SDL_Window* g_window = nullptr;
 SDL_Renderer* g_renderer = nullptr;
-SDL_Texture* g_texture = nullptr;
+GameScreenManager* game_screen_manager = nullptr;
+Uint32 g_old_time;
 
-bool InitSDL();
-void CloseSDL();
-bool Update();
-void Render();
-SDL_Texture* LoadTextureFromFile(string path);
-
-bool InitSDL()
+bool InitSDL() 
 {
     // Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) 
     {
-        cout << "SDL did not initialise. Error: " << SDL_GetError();
+        cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << endl;
         return false;
     }
 
     // Create window
-    g_window = SDL_CreateWindow("Games Engine Creation",
-        SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED,
-        SCREEN_WIDTH,
-        SCREEN_HEIGHT,
-        SDL_WINDOW_RESIZABLE);
-
-    if (g_window == nullptr)
+    g_window = SDL_CreateWindow("Mario Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
+    if (g_window == nullptr) 
     {
-        cout << "Window was not created. Error : " << SDL_GetError();
+        cout << "Window could not be created! SDL Error: " << SDL_GetError() << endl;
         return false;
     }
 
     // Create renderer
     g_renderer = SDL_CreateRenderer(g_window, -1, SDL_RENDERER_ACCELERATED);
-
-    if (g_renderer == nullptr)
+    if (g_renderer == nullptr) 
     {
-        cout << "Renderer could not be created. Error: " << SDL_GetError();
+        cout << "Renderer could not be created! SDL Error: " << SDL_GetError() << endl;
         return false;
     }
 
-    // Initialize PNG loading
-    int imageFlags = IMG_INIT_PNG;
-    if (!(IMG_Init(imageFlags) & imageFlags))
-    {
-        cout << "SDL_Image could not initialize. Error: " << IMG_GetError();
-        return false;
-    }
-
-    // Load the texture
-    g_texture = LoadTextureFromFile("Images/garnacho.bmp");
-    if (g_texture == nullptr)
-    {
-        cout << "Failed to load texture.";
-        return false;
-    }
+    // Set renderer color
+    SDL_SetRenderDrawColor(g_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
     return true;
 }
 
 void CloseSDL()
 {
-    // Release the texture
-    SDL_DestroyTexture(g_texture);
-    g_texture = nullptr;
+    // destroy game screen manager
+    delete game_screen_manager;
+    game_screen_manager = nullptr;
 
-    // Destroy renderer
     SDL_DestroyRenderer(g_renderer);
     g_renderer = nullptr;
 
-    // Destroy window
     SDL_DestroyWindow(g_window);
     g_window = nullptr;
 
-    // Quit SDL subsystems
-    IMG_Quit();
     SDL_Quit();
-}
-
-bool Update()
-{
-    // Event handler
-    SDL_Event e;
-
-    // Poll SDL for any events
-    SDL_PollEvent(&e);
-
-    // Handle the events
-    switch (e.type)
-    {
-        // Click the 'X' to quit
-    case SDL_QUIT:
-        return true;
-        break;
-    }
-
-    return false;
 }
 
 void Render()
@@ -113,63 +66,59 @@ void Render()
     SDL_SetRenderDrawColor(g_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(g_renderer);
 
-    // Set where to render the texture
-    SDL_Rect renderLocation = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
-
-    // Render to screen
-    SDL_RenderCopy(g_renderer, g_texture, NULL, &renderLocation);
+    game_screen_manager->Render();
 
     // Update the screen
     SDL_RenderPresent(g_renderer);
 }
 
-SDL_Texture* LoadTextureFromFile(string path)
+bool Update()
 {
-    // The final texture
-    SDL_Texture* newTexture = nullptr;
+    SDL_Event e;
+    SDL_PollEvent(&e);
 
-    // Load image at specified path
-    SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-    if (loadedSurface == nullptr)
+    if (e.type == SDL_QUIT)
     {
-        cout << "Unable to load image " << path << ". SDL_image Error: " << IMG_GetError();
-    }
-    else
-    {
-        // Create texture from surface pixels
-        newTexture = SDL_CreateTextureFromSurface(g_renderer, loadedSurface);
-        if (newTexture == nullptr)
-        {
-            cout << "Unable to create texture from " << path << ". SDL Error: " << SDL_GetError();
-        }
-
-        // Get rid of old loaded surface
-        SDL_FreeSurface(loadedSurface);
+        return true;
     }
 
-    return newTexture;
+    Uint32 new_time = SDL_GetTicks();
+    float deltaTime = (float)(new_time - g_old_time) / 1000.0f;
+    g_old_time = new_time;
+
+    game_screen_manager->Update(deltaTime, e);
+
+    return false;
 }
 
-int main(int argc, char* args[])
+int main(int argc, char* args[]) 
 {
-    // Flag to check if we wish to quit
+    if (!InitSDL()) 
+    {
+        return -1;
+    }
+
+    // Create the GameScreenManager instance
+    game_screen_manager = new GameScreenManager(g_renderer, SCREEN_LEVEL1);
+
+    g_old_time = SDL_GetTicks();
+
+    // Main loop
     bool quit = false;
 
-    // Initialize SDL and check
-    if (!InitSDL())
+    SDL_Event e;
+
+    while (!quit) 
     {
-        return 1; // Exit the program if SDL initialization fails
+        // Update and render
+        quit = Update();
+        Render();
     }
 
-    // Game Loop
-    while (!quit)
-    {
-        Render(); // Render texture to screen
-        quit = Update(); // Check for quit event
-    }
-
-    // Close SDL before ending the program
+    // Clean up
     CloseSDL();
+    delete game_screen_manager;
+    game_screen_manager = nullptr;
 
     return 0;
 }
