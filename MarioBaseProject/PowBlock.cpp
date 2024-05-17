@@ -15,9 +15,12 @@ PowBlock::PowBlock(SDL_Renderer* renderer, LevelMap* map)
 
     m_renderer = renderer;
     m_level_map = map;
+
     m_single_sprite_w = m_texture->GetWidth()/3.0f; // there are three images in this sprite sheet in a row
     m_single_sprite_h = m_texture->GetHeight();
+
     m_num_hits_left = 3;
+
     m_position = new Vector2D((SCREEN_WIDTH * 0.5f) - m_single_sprite_w * 0.5, 260);
 }
 
