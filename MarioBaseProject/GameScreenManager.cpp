@@ -2,6 +2,7 @@
 #include "GameScreen.h"
 #include "GameScreenLevel1.h"
 #include "GameScreenIntro.h"
+#include "FlappyBirdScreen.h"
 #include <iostream>
 using namespace std;
 
@@ -54,6 +55,12 @@ void GameScreenManager::ChangeScreen(SCREENS new_screen)
         m_current_screen = (GameScreen*)tempScreen;
         tempScreen = nullptr;
         break;
+    case FLAPPY_BIRD_SCREEN:
+        tempScreen = new FlappyBirdScreen(m_renderer, this);
+        m_current_screen = (GameScreen*)tempScreen;
+        tempScreen = nullptr;
+        break;
+
     default:
         cout << "Invalid screen type!" << endl;
         break;

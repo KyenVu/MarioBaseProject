@@ -33,11 +33,16 @@ public:
 	float GetCollisionRadius();
 
 	Vector2D GetPosition();
+
 	inline Rect2D GetCollisionBox()
 	{
 		return Rect2D(m_position.x, m_position.y,
 		m_texture->GetWidth(), m_texture->GetHeight());
 	}
+
+	inline bool GetAlive() { return m_alive; }
+
+	void SetAlive(bool IsAlive) { m_alive = IsAlive; }
 
 protected:
 	SDL_Renderer* m_renderer;
@@ -51,6 +56,7 @@ protected:
 	bool m_can_jump;
 	bool m_moving_left;
 	bool m_moving_right;
+	bool m_alive;
 
 	float m_jump_force;
 	float m_collision_radius;	

@@ -63,7 +63,7 @@ void CloseSDL()
 void Render()
 {
     // Clear the screen
-    SDL_SetRenderDrawColor(g_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_SetRenderDrawColor(g_renderer, 0x00, 0x00, 0x00, 0x00);
     SDL_RenderClear(g_renderer);
 
     game_screen_manager->Render();
@@ -80,6 +80,24 @@ bool Update()
     if (e.type == SDL_QUIT)
     {
         return true;
+    }
+
+    if (e.type == SDL_KEYDOWN)
+    {
+        switch (e.key.keysym.sym)
+        {
+        case SDLK_1:
+            game_screen_manager->ChangeScreen(SCREEN_LEVEL1);
+            break;
+        case SDLK_2:
+            game_screen_manager->ChangeScreen(SCREEN_INTRO);
+            break;
+        case SDLK_3:
+            game_screen_manager->ChangeScreen(FLAPPY_BIRD_SCREEN);
+            break;
+        default:
+            break;
+        }
     }
 
     Uint32 new_time = SDL_GetTicks();
