@@ -27,6 +27,12 @@ GameScreenLevel1::~GameScreenLevel1()
         delete m_enemies[i];
     }
     m_enemies.clear();
+
+    for (int i = 0; i < m_coins.size(); i++) 
+    {
+        delete m_coins[i];
+    }
+    m_coins.clear();
 }
 
 // Render to Game screen level 1
@@ -36,6 +42,11 @@ void GameScreenLevel1::Render()
     for (int i = 0; i < m_enemies.size(); i++)
     {
         m_enemies[i]->Render();
+    }
+
+    for (int i = 0; i < m_coins.size(); i++) 
+    {
+        m_coins[i]->Render();
     }
 
     // draw background
@@ -55,6 +66,8 @@ void GameScreenLevel1::Update(float deltaTime, SDL_Event e)
     UpdatePowBlock();
     UpdateEnemies(deltaTime, e);
     UpdateKoopaSpawn(deltaTime);
+
+    UpdateCoins(deltaTime, e);
 
     //do shake screen
     if (m_screenshake)
@@ -86,6 +99,7 @@ void GameScreenLevel1::CreateKoopa(Vector2D position, FACING direction, float sp
     m_enemies.push_back(koopa);
 }
 
+
 bool GameScreenLevel1::SetUpLevel() 
 {
     //create background texture
@@ -106,8 +120,11 @@ bool GameScreenLevel1::SetUpLevel()
     mario = new CharacterMario(m_renderer, "Images/Mario.png", Vector2D(64, 300), m_level_map);
     luigi = new CharacterLuigi(m_renderer, "Images/Luigi.png", Vector2D(128, 300), m_level_map);
 
-    //CreateKoopa(Vector2D(150, 330), FACING_LEFT, KOOPA_SPEED);
+    CreateKoopa(Vector2D(150, 330), FACING_LEFT, KOOPA_SPEED);
     CreateKoopa(Vector2D(325, 30), FACING_RIGHT, KOOPA_SPEED);
+
+    CreateCoin(Vector2D(200, 300));
+    CreateCoin(Vector2D(300, 300));
 
     return true;
 }
@@ -138,10 +155,35 @@ void GameScreenLevel1::SetLevelMap()
     { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
     };
 
-
     //set the new one 
     m_level_map = new LevelMap(map);
 
+}
+
+void GameScreenLevel1::CreateCoin(Vector2D position)
+{
+    CharacterCoin* coin = new CharacterCoin(m_renderer, "Images/Coin.png", position, m_level_map);
+    m_coins.push_back(coin);
+}
+
+void GameScreenLevel1::UpdateCoins(float deltaTime, SDL_Event e)
+{
+    if (!m_coins.empty()) 
+    {
+        for (unsigned int i = 0; i < m_coins.size(); i++)
+        {
+            m_coins[i]->Update(deltaTime, e);
+            // Check for collision with players and remove coin if collected
+            if (Collisions::Instance()->Box(mario->GetCollisionBox(), m_coins[i]->GetCollisionBox()) ||
+                Collisions::Instance()->Box(luigi->GetCollisionBox(), m_coins[i]->GetCollisionBox())) 
+            {
+                // Collect the coin, add points, etc.
+                delete m_coins[i];
+                m_coins.erase(m_coins.begin() + i);
+                // Add points or handle collection logic here
+            }
+        }
+    }
 }
 
 void GameScreenLevel1::UpdateEnemies(float deltaTime, SDL_Event e)

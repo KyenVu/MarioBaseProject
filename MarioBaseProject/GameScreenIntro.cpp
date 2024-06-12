@@ -38,7 +38,7 @@ bool GameScreenIntro::SetUpLevel()
 {
     //create background texture
     m_background_texture = new Texture2D(m_renderer);
-    if (!m_background_texture->LoadFromFile("Images/garnacho.bmp")) 
+    if (!m_background_texture->LoadFromFile("Images/MarioMenu.jpg")) 
     {
         cout << "Failed to load background texture!" << endl;
         return false;

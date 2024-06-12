@@ -13,6 +13,7 @@
 #include "CharacterMario.h"
 #include "CharacterLuigi.h"
 #include "CharacterKoopa.h"
+#include "CharacterCoin.h"
 #include "LevelMap.h"
 #include "Collisions.h"
 #include "PowBlock.h"
@@ -36,6 +37,7 @@ public:
 private:
 
 	vector<CharacterKoopa*> m_enemies;
+	vector<CharacterCoin*> m_coins;
 
 	Texture2D* m_background_texture;
 	CharacterMario* mario;
@@ -59,5 +61,8 @@ private:
 	void UpdateEnemies(float deltaTime, SDL_Event e);
 	void UpdateKoopaSpawn(float deltaTime);
 	void CreateKoopa(Vector2D position, FACING direction, float speed);
+
+	void CreateCoin(Vector2D position);
+	void UpdateCoins(float deltaTime, SDL_Event e);
 
 };

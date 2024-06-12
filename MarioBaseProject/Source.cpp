@@ -82,6 +82,24 @@ bool Update()
         return true;
     }
 
+    if (e.type == SDL_KEYDOWN)
+    {
+        switch (e.key.keysym.sym)
+        {
+        case SDLK_1:
+            game_screen_manager->ChangeScreen(SCREEN_LEVEL1);
+            break;
+        case SDLK_2:
+            game_screen_manager->ChangeScreen(SCREEN_INTRO);
+            break;
+        case SDLK_3:
+            game_screen_manager->ChangeScreen(FLAPPY_BIRD_SCREEN);
+            break;
+        default:
+            break;
+        }
+    }
+
     Uint32 new_time = SDL_GetTicks();
     float deltaTime = (float)(new_time - g_old_time) / 1000.0f;
     g_old_time = new_time;
