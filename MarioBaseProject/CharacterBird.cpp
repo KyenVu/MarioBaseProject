@@ -52,10 +52,20 @@ void CharacterBird::Update(float deltaTime, SDL_Event e)
 
 void CharacterBird::Jump()
 {
-    if (!m_is_jumping)
-    {
+    
         m_is_jumping = true;
         m_jump_force = FLAPPY_JUMP_FORCE; 
+
+}
+
+void CharacterBird::FallOffMap(float deltaTime, float groundLevel)
+{
+    m_position.y += 300.0f * deltaTime; // Adjust the falling speed as needed
+
+    // Check if the bird has hit the ground
+    if (m_position.y + m_texture->GetHeight() >= groundLevel)
+    {
+        m_position.y = groundLevel - m_texture->GetHeight();
     }
 }
 
@@ -63,3 +73,4 @@ SDL_Rect CharacterBird::GetCollisionBox()
 {
     return m_collision_box;
 }
+

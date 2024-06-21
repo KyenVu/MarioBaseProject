@@ -1,6 +1,7 @@
 ﻿#include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
+#include <SDL_ttf.h>
 #include <iostream>
 #include "Texture2D.h"
 #include "Commons.h"
@@ -20,6 +21,12 @@ bool InitSDL()
     if (SDL_Init(SDL_INIT_VIDEO) < 0) 
     {
         cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << endl;
+        return false;
+    }
+
+    if (TTF_Init() < 0) 
+    {
+        cout << "Text could not initialize! SDL Error: " << SDL_GetError() << endl;
         return false;
     }
 
@@ -90,9 +97,6 @@ bool Update()
             game_screen_manager->ChangeScreen(SCREEN_LEVEL1);
             break;
         case SDLK_2:
-            game_screen_manager->ChangeScreen(SCREEN_INTRO);
-            break;
-        case SDLK_3:
             game_screen_manager->ChangeScreen(FLAPPY_BIRD_SCREEN);
             break;
         default:
@@ -117,7 +121,7 @@ int main(int argc, char* args[])
     }
 
     // Create the GameScreenManager instance
-    game_screen_manager = new GameScreenManager(g_renderer, SCREEN_LEVEL1);
+    game_screen_manager = new GameScreenManager(g_renderer, SCREEN_INTRO);
 
     g_old_time = SDL_GetTicks();
 

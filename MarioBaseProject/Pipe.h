@@ -11,15 +11,24 @@ public:
 
     void Render();
     void Update(float deltaTime, SDL_Event e);
+    void SetScored(bool scored) { m_scored = scored; }
+    bool HasScored() const { return m_scored; }
+
     SDL_Rect GetCollisionBox();
+    Vector2D GetPosition() const { return m_position; }
 
 private:
-    SDL_Renderer* m_renderer;
-    Vector2D m_position;
     Texture2D* m_texture;
-    SDL_Rect m_collision_box;
+    Vector2D m_position;
+    SDL_Renderer* m_renderer;
 
-    bool m_is_top;
+    bool m_isTop;
+    bool m_scored;
+    float m_verticalSpeed;
+    float m_horizontalSpeed;
+    float m_maxVerticalDisplacement;
+    float m_initialY;
+
 };
 
 #endif // PIPE_H
