@@ -14,8 +14,15 @@ public:
 
     void Render();
     void Update(float deltaTime, SDL_Event e);
+
     void Jump();
+
+    void FallOffMap(float deltaTime, float groundLevel);
+
     SDL_Rect GetCollisionBox();
+    Vector2D GetPosition() const { return m_position; }
+    Vector2D SetPosition() const { return m_position; }
+
 
 private:
     SDL_Renderer* m_renderer;
@@ -24,8 +31,9 @@ private:
     SDL_Rect m_collision_box;
 
     float m_jump_force;
-    bool m_is_jumping;
     float m_gravity = FLAPPY_GRAVITY;
+    bool m_is_jumping;
+
 };
 
 #endif // CHARACTER_BIRD_H

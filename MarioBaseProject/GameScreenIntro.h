@@ -4,6 +4,7 @@
 #include "GameScreenManager.h"
 #include "Texture2D.h"
 #include <iostream>
+#include <SDL_ttf.h>
 
 class GameScreenIntro : public GameScreen
 {
@@ -17,6 +18,8 @@ public:
 private:
     Texture2D* m_background_texture;
     GameScreenManager* m_manager;
+    TTF_Font* m_font;
 
     bool SetUpLevel();
+    void RenderText(const std::string& message, SDL_Color color, int x, int y);
 };
