@@ -11,7 +11,7 @@ public:
 	void Jump();
 	void Render() override;
 	void CheckForBounderies();
-
+	Rect2D GetHeadCollisionBox();
 	inline bool GetInjured() { return m_injured; }
 
 	void Update(float deltaTime, SDL_Event e) override;

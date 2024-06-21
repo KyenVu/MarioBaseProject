@@ -31,7 +31,7 @@ public:
 	}
 
 	float GetCollisionRadius();
-
+	Rect2D GetFeetCollisionBox();
 	Vector2D GetPosition();
 
 	inline Rect2D GetCollisionBox()
@@ -39,6 +39,8 @@ public:
 		return Rect2D(m_position.x, m_position.y,
 		m_texture->GetWidth(), m_texture->GetHeight());
 	}
+
+	void Bounce();
 
 	inline bool GetAlive() { return m_alive; }
 

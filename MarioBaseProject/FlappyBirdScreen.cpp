@@ -153,8 +153,8 @@ void FlappyBirdScreen::RenderText(const std::string& message, SDL_Color color, i
 
 void FlappyBirdScreen::CreatePipe(float xPosition) 
 {
-    int gap_y = rand() % 116 + 100; // Randomize pipe gap position within a more suitable range
-    int gap_height = 150; // Height of the gap between the top and bottom pipes
+    int gap_y = rand() % 100 + 100; // Randomize pipe gap position within a more suitable range
+    int gap_height = 100; // Height of the gap between the top and bottom pipes
 
     Pipe* topPipe = new Pipe(m_renderer, Vector2D(xPosition, gap_y - 200), true); // Top pipe
     Pipe* bottomPipe = new Pipe(m_renderer, Vector2D(xPosition, gap_y + gap_height), false); // Bottom pipe

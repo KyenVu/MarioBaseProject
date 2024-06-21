@@ -1,12 +1,14 @@
 ﻿#include "GameScreenLevel1.h"
+#include <SDL_ttf.h>
 
-GameScreenLevel1::GameScreenLevel1(SDL_Renderer* renderer) : GameScreen(renderer) 
+GameScreenLevel1::GameScreenLevel1(SDL_Renderer* renderer) : GameScreen(renderer), m_score(0) // Initialize score
 {
     SetLevelMap();
     SetUpLevel();
+    
 }
 
-GameScreenLevel1::~GameScreenLevel1() 
+GameScreenLevel1::~GameScreenLevel1()
 {
     delete m_background_texture;
     m_background_texture = nullptr;
@@ -28,15 +30,22 @@ GameScreenLevel1::~GameScreenLevel1()
     }
     m_enemies.clear();
 
-    for (int i = 0; i < m_coins.size(); i++) 
+    for (int i = 0; i < m_coins.size(); i++)
     {
         delete m_coins[i];
     }
     m_coins.clear();
+
+    // Clean up font
+    if (m_font)
+    {
+        TTF_CloseFont(m_font);
+        m_font = nullptr;
+    }
 }
 
 // Render to Game screen level 1
-void GameScreenLevel1::Render() 
+void GameScreenLevel1::Render()
 {
     //draw enemies
     for (int i = 0; i < m_enemies.size(); i++)
@@ -44,7 +53,7 @@ void GameScreenLevel1::Render()
         m_enemies[i]->Render();
     }
 
-    for (int i = 0; i < m_coins.size(); i++) 
+    for (int i = 0; i < m_coins.size(); i++)
     {
         m_coins[i]->Render();
     }
@@ -55,9 +64,28 @@ void GameScreenLevel1::Render()
     mario->Render();
     luigi->Render();
     m_pow_block->Render();
+
+    // Render score
+    RenderScore();
+    if (m_score >= 10)
+    {
+        SDL_Color color = { 255, 255, 255, 255 }; // White color
+        std::string winText = "You Win! Press 2 to play the next game.";
+        SDL_Surface* surfaceMessage = TTF_RenderText_Solid(m_font, winText.c_str(), color);
+        SDL_Texture* message = SDL_CreateTextureFromSurface(m_renderer, surfaceMessage);
+
+        int text_width = surfaceMessage->w;
+        int text_height = surfaceMessage->h;
+        SDL_Rect message_rect = { SCREEN_WIDTH / 2 - text_width / 2, SCREEN_HEIGHT / 2 - text_height / 2, text_width, text_height };
+
+        SDL_RenderCopy(m_renderer, message, NULL, &message_rect);
+
+        SDL_FreeSurface(surfaceMessage);
+        SDL_DestroyTexture(message);
+    }
 }
 
-void GameScreenLevel1::Update(float deltaTime, SDL_Event e) 
+void GameScreenLevel1::Update(float deltaTime, SDL_Event e)
 {
     //update character
     mario->Update(deltaTime, e);
@@ -100,7 +128,7 @@ void GameScreenLevel1::CreateKoopa(Vector2D position, FACING direction, float sp
 }
 
 
-bool GameScreenLevel1::SetUpLevel() 
+bool GameScreenLevel1::SetUpLevel()
 {
     //create background texture
     m_background_texture = new Texture2D(m_renderer);
@@ -108,24 +136,31 @@ bool GameScreenLevel1::SetUpLevel()
     m_screenshake = false;
     m_background_yPos = 0.0f;
 
-
-
-    if (!m_background_texture->LoadFromFile("Images/BackgroundMB.png")) 
+    if (!m_background_texture->LoadFromFile("Images/BackgroundMB.png"))
     {
         cout << "Failed to load background texture!" << endl;
         return false;
     }
-  
+
+    // Load font
+    m_font = TTF_OpenFont("PIXEARG_.ttf", 28);
+    if (!m_font)
+    {
+        std::cout << "Failed to load font: " << TTF_GetError() << std::endl;
+    }
 
     mario = new CharacterMario(m_renderer, "Images/Mario.png", Vector2D(64, 300), m_level_map);
     luigi = new CharacterLuigi(m_renderer, "Images/Luigi.png", Vector2D(128, 300), m_level_map);
 
-    CreateKoopa(Vector2D(150, 330), FACING_LEFT, KOOPA_SPEED);
+    CreateKoopa(Vector2D(150, 30), FACING_LEFT, KOOPA_SPEED);
     CreateKoopa(Vector2D(325, 30), FACING_RIGHT, KOOPA_SPEED);
 
-    CreateCoin(Vector2D(200, 300));
-    CreateCoin(Vector2D(300, 300));
-
+    CreateCoin(Vector2D(300, 30));
+    CreateCoin(Vector2D(200, 30));
+    CreateCoin(Vector2D(100, 30));
+    CreateCoin(Vector2D(400, 30));
+    CreateCoin(Vector2D(200, 100));
+    CreateCoin(Vector2D(300, 100));
     return true;
 }
 
@@ -138,7 +173,7 @@ void GameScreenLevel1::SetLevelMap()
         delete m_level_map;
     }
 
-    int map[MAP_HEIGHT][MAP_WIDTH] = 
+    int map[MAP_HEIGHT][MAP_WIDTH] =
     {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -168,19 +203,22 @@ void GameScreenLevel1::CreateCoin(Vector2D position)
 
 void GameScreenLevel1::UpdateCoins(float deltaTime, SDL_Event e)
 {
-    if (!m_coins.empty()) 
+    if (!m_coins.empty())
     {
         for (unsigned int i = 0; i < m_coins.size(); i++)
         {
             m_coins[i]->Update(deltaTime, e);
             // Check for collision with players and remove coin if collected
             if (Collisions::Instance()->Box(mario->GetCollisionBox(), m_coins[i]->GetCollisionBox()) ||
-                Collisions::Instance()->Box(luigi->GetCollisionBox(), m_coins[i]->GetCollisionBox())) 
+                Collisions::Instance()->Box(luigi->GetCollisionBox(), m_coins[i]->GetCollisionBox()))
             {
                 // Collect the coin, add points, etc.
                 delete m_coins[i];
                 m_coins.erase(m_coins.begin() + i);
                 // Add points or handle collection logic here
+                m_score += 1;
+                cout << "Coin collected! Score: " << m_score << endl;
+                // Display text logic here if needed
             }
         }
     }
@@ -188,22 +226,22 @@ void GameScreenLevel1::UpdateCoins(float deltaTime, SDL_Event e)
 
 void GameScreenLevel1::UpdateEnemies(float deltaTime, SDL_Event e)
 {
-    if (!m_enemies.empty()) 
+    if (!m_enemies.empty())
     {
         int enemyIndexToDelete = -1;
-        for (unsigned int i = 0; i < m_enemies.size(); i++) 
+        for (unsigned int i = 0; i < m_enemies.size(); i++)
         {
             // Check if the enemy is on the bottom row of tiles
-            if (m_enemies[i]->GetPosition().y > 300.0f) 
+            if (m_enemies[i]->GetPosition().y > 300.0f)
             {
                 // Is the enemy off-screen to the left/right?
                 if (m_enemies[i]->GetPosition().x < (-m_enemies[i]->GetCollisionBox().width * 0.5f) ||
-                    m_enemies[i]->GetPosition().x > SCREEN_WIDTH) 
+                    m_enemies[i]->GetPosition().x > SCREEN_WIDTH)
                 {
                     m_enemies[i]->SetAlive(false);
                 }
             }
-            else 
+            else
             {
                 m_enemies[i]->CheckForBounderies();
             }
@@ -212,42 +250,62 @@ void GameScreenLevel1::UpdateEnemies(float deltaTime, SDL_Event e)
             m_enemies[i]->Update(deltaTime, e);
             // Check to see if enemy collides with player
             if ((m_enemies[i]->GetPosition().y > 300.0f || m_enemies[i]->GetPosition().y <= 64.0f) &&
-                (m_enemies[i]->GetPosition().x < 64.0f || m_enemies[i]->GetPosition().x > SCREEN_WIDTH - 96.0f)) 
+                (m_enemies[i]->GetPosition().x < 64.0f || m_enemies[i]->GetPosition().x > SCREEN_WIDTH - 96.0f))
             {
                 // Ignore collisions if behind pipe
             }
-            else 
+            else
             {
-                if (Collisions::Instance()->Circle(m_enemies[i], mario)) 
+                if (Collisions::Instance()->Circle(m_enemies[i], mario))
                 {
-                    if (m_enemies[i]->GetInjured()) 
+                    if (m_enemies[i]->GetInjured())
                     {
                         m_enemies[i]->SetAlive(false);
+                        m_score += 1;
                     }
-                    else {
-
+                    else
+                    {
                         // Kill Mario
+                        cout << "Mario killed by Koopa!" << endl;
+                        mario->SetAlive(false);
                     }
-                } if (Collisions::Instance()->Circle(m_enemies[i], luigi)) 
+                }
+                if (Collisions::Instance()->Circle(m_enemies[i], luigi))
                 {
-                    if (m_enemies[i]->GetInjured()) 
+                    if (m_enemies[i]->GetInjured())
                     {
                         m_enemies[i]->SetAlive(false);
+                        m_score += 1;
                     }
-                    else {
-
+                    else
+                    {
                         // Kill Luigi
+                        cout << "Luigi killed by Koopa!" << endl;
+                        luigi->SetAlive(false);
                     }
+                }
+                // Check if Mario or Luigi jumps on the Koopa's head
+                if (Collisions::Instance()->Box(mario->GetFeetCollisionBox(), m_enemies[i]->GetHeadCollisionBox()))
+                {
+                    m_enemies[i]->SetAlive(false);
+                    m_score += 1;
+                    mario->Bounce();
+                }
+                if (Collisions::Instance()->Box(luigi->GetFeetCollisionBox(), m_enemies[i]->GetHeadCollisionBox()))
+                {
+                    m_enemies[i]->SetAlive(false);
+                    m_score += 1;
+                    luigi->Bounce();
                 }
             }
             // If the enemy is no longer alive then schedule it for deletion
-            if (!m_enemies[i]->GetAlive()) 
+            if (!m_enemies[i]->GetAlive())
             {
                 enemyIndexToDelete = i;
             }
         }
         // Remove dead enemies - 1 each update
-        if (enemyIndexToDelete != -1) 
+        if (enemyIndexToDelete != -1)
         {
             m_enemies.erase(m_enemies.begin() + enemyIndexToDelete);
         }
@@ -258,7 +316,7 @@ void GameScreenLevel1::UpdateEnemies(float deltaTime, SDL_Event e)
 void GameScreenLevel1::UpdateKoopaSpawn(float deltaTime)
 {
     m_koopa_spawn_timer -= deltaTime;
-    if (m_koopa_spawn_timer <= 0.0f) 
+    if (m_koopa_spawn_timer <= 0.0f)
     {
         CreateKoopa(Vector2D(150, 32), FACING_RIGHT, KOOPA_SPEED);
         cout << "koopa spawned" << endl;
@@ -305,4 +363,22 @@ void GameScreenLevel1::DoScreenShake()
     {
         m_enemies[i]->TakeDamage();
     }
+}
+
+void GameScreenLevel1::RenderScore()
+{
+    SDL_Color color = { 255, 255, 255, 255 }; // White color
+    std::string scoreText = "Score: " + std::to_string(m_score);
+
+    SDL_Surface* surfaceMessage = TTF_RenderText_Solid(m_font, scoreText.c_str(), color);
+    SDL_Texture* message = SDL_CreateTextureFromSurface(m_renderer, surfaceMessage);
+
+    int text_width = surfaceMessage->w;
+    int text_height = surfaceMessage->h;
+    SDL_Rect message_rect = { 10, 10, text_width, text_height }; // Adjust the position and size as needed
+
+    SDL_RenderCopy(m_renderer, message, NULL, &message_rect);
+
+    SDL_FreeSurface(surfaceMessage);
+    SDL_DestroyTexture(message);
 }

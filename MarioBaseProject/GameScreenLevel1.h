@@ -1,10 +1,11 @@
 #pragma once
-#ifdef GameScreenLevel1.h
-#define GameScreenLevel1.h
-#endif // GameScreenLevel1.h
+#ifdef GameScreenLevel1_h
+#define GameScreenLevel1_h
+#endif // GameScreenLevel1_h
 
 #include <iostream>
 #include <vector>
+#include <SDL_ttf.h>
 #include "Commons.h"
 #include "Texture2D.h"
 #include "GameScreen.h"
@@ -25,44 +26,41 @@ class Character;
 class GameScreenLevel1 : public GameScreen
 {
 public:
-	GameScreenLevel1(SDL_Renderer* renderer);
-	~GameScreenLevel1();
+    GameScreenLevel1(SDL_Renderer* renderer);
+    ~GameScreenLevel1();
 
-	void Render() override;
-	void Update(float deltaTime, SDL_Event e) override;
-	void UpdatePowBlock();
-	void DoScreenShake();
-
+    void Render() override;
+    void Update(float deltaTime, SDL_Event e) override;
+    void UpdatePowBlock();
+    void DoScreenShake();
 
 private:
+    vector<CharacterKoopa*> m_enemies;
+    vector<CharacterCoin*> m_coins;
 
-	vector<CharacterKoopa*> m_enemies;
-	vector<CharacterCoin*> m_coins;
+    Texture2D* m_background_texture;
+    CharacterMario* mario;
+    CharacterLuigi* luigi;
+    CharacterKoopa* koopa;
+    LevelMap* m_level_map;
+    PowBlock* m_pow_block;
+    TTF_Font* m_font;
 
-	Texture2D* m_background_texture;
-	CharacterMario* mario;
-	CharacterLuigi* luigi;
-	CharacterKoopa* koopa;
-	LevelMap* m_level_map;
-	PowBlock* m_pow_block;
+    bool m_screenshake;
 
-	bool m_screenshake;
+    float m_shake_time;
+    float m_wobble;
+    float m_background_yPos;
+    float m_koopa_spawn_timer = 15.0f;
+    int m_score = 0;
+    int dead = 0;
 
-	float m_shake_time;
-	float m_wobble;
-	float m_background_yPos;
-	float m_koopa_spawn_timer = 15.0f;
-
-
-	bool SetUpLevel();
-
-	void SetLevelMap();
-
-	void UpdateEnemies(float deltaTime, SDL_Event e);
-	void UpdateKoopaSpawn(float deltaTime);
-	void CreateKoopa(Vector2D position, FACING direction, float speed);
-
-	void CreateCoin(Vector2D position);
-	void UpdateCoins(float deltaTime, SDL_Event e);
-
+    bool SetUpLevel();
+    void SetLevelMap();
+    void UpdateEnemies(float deltaTime, SDL_Event e);
+    void UpdateKoopaSpawn(float deltaTime);
+    void CreateKoopa(Vector2D position, FACING direction, float speed);
+    void CreateCoin(Vector2D position);
+    void UpdateCoins(float deltaTime, SDL_Event e);
+    void RenderScore();
 };

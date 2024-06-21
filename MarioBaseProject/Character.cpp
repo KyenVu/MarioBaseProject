@@ -116,8 +116,25 @@ Vector2D Character::GetPosition()
 	return m_position;
 }
 
+void Character::Bounce()
+{
+	Jump();
+}
+
 float Character::GetCollisionRadius()
 {
 	return m_collision_radius;
+}
+
+Rect2D Character::GetFeetCollisionBox()
+{
+	Rect2D feetCollisionBox = 
+	{
+	   (float)m_position.x,
+	   (float)(m_position.y + m_texture->GetHeight() - 5), // Adjust as needed for accurate feet position
+	   (float)m_texture->GetWidth(),
+	   5 // Height of the feet collision box
+	};
+	return feetCollisionBox;
 }
 
