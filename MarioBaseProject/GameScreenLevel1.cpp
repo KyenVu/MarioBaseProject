@@ -47,30 +47,57 @@ GameScreenLevel1::~GameScreenLevel1()
 // Render to Game screen level 1
 void GameScreenLevel1::Render()
 {
-    //draw enemies
+    // Draw background
+    m_background_texture->Render(Vector2D(0, m_background_yPos), SDL_FLIP_NONE);
+
+    // Draw enemies
     for (int i = 0; i < m_enemies.size(); i++)
     {
         m_enemies[i]->Render();
     }
 
+    // Draw coins
     for (int i = 0; i < m_coins.size(); i++)
     {
         m_coins[i]->Render();
     }
 
-    // draw background
-    m_background_texture->Render(Vector2D(0, m_background_yPos), SDL_FLIP_NONE);
+    // Render Mario and Luigi if they are alive
+    if (mario->GetAlive())
+    {
+        mario->Render();
+    }
+    if (luigi->GetAlive())
+    {
+        luigi->Render();
+    }
 
-    mario->Render();
-    luigi->Render();
+    // Render POW block
     m_pow_block->Render();
 
     // Render score
     RenderScore();
-    if (m_score >= 10)
+
+    if (m_game_over)
     {
-        SDL_Color color = { 255, 255, 255, 255 }; // White color
-        std::string winText = "You Win! Press 2 to play the next game.";
+        SDL_Color color = { 255, 0, 0, 255 };
+        std::string gameOverText = "You Lose! Press 1 to reset.";
+        SDL_Surface* surfaceMessage = TTF_RenderText_Solid(m_font, gameOverText.c_str(), color);
+        SDL_Texture* message = SDL_CreateTextureFromSurface(m_renderer, surfaceMessage);
+
+        int text_width = surfaceMessage->w;
+        int text_height = surfaceMessage->h;
+        SDL_Rect message_rect = { SCREEN_WIDTH / 2 - text_width / 2, SCREEN_HEIGHT / 2 - text_height / 2, text_width, text_height };
+
+        SDL_RenderCopy(m_renderer, message, NULL, &message_rect);
+
+        SDL_FreeSurface(surfaceMessage);
+        SDL_DestroyTexture(message);
+    }
+    else if (m_score >= 10)
+    {
+        SDL_Color color = { 255, 0, 0, 255 };
+        std::string winText = "You Win! Press 2 to continue.";
         SDL_Surface* surfaceMessage = TTF_RenderText_Solid(m_font, winText.c_str(), color);
         SDL_Texture* message = SDL_CreateTextureFromSurface(m_renderer, surfaceMessage);
 
@@ -85,11 +112,32 @@ void GameScreenLevel1::Render()
     }
 }
 
+
 void GameScreenLevel1::Update(float deltaTime, SDL_Event e)
 {
-    //update character
-    mario->Update(deltaTime, e);
-    luigi->Update(deltaTime, e);
+    if (m_game_over)
+    {
+        if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_1)
+        {
+            // Reset the game
+            SetUpLevel();
+            m_score = 0;
+            m_game_over = false;
+            mario->SetAlive(true);
+            luigi->SetAlive(true);
+        }
+        return;
+    }
+
+    // Update characters if they are alive
+    if (mario->GetAlive())
+    {
+        mario->Update(deltaTime, e);
+    }
+    if (luigi->GetAlive())
+    {
+        luigi->Update(deltaTime, e);
+    }
 
     UpdatePowBlock();
     UpdateEnemies(deltaTime, e);
@@ -97,17 +145,17 @@ void GameScreenLevel1::Update(float deltaTime, SDL_Event e)
 
     UpdateCoins(deltaTime, e);
 
-    //do shake screen
+    // Do shake screen
     if (m_screenshake)
     {
         m_shake_time -= deltaTime;
         m_wobble++;
         m_background_yPos = sin(m_wobble);
         m_background_yPos *= 3.0f;
-        // end shake screen
+        // End shake screen
         if (m_shake_time <= 0.0f)
         {
-            m_shake_time = false;
+            m_screenshake = false;
             m_background_yPos = 0.0f;
         }
     }
@@ -116,11 +164,13 @@ void GameScreenLevel1::Update(float deltaTime, SDL_Event e)
     {
         cout << "Box hit!" << endl;
     }
-    //if (Collisions::Instance()->Circle(mario, luigi))
-    //{
-    //    cout << "Circle hit" << endl;
-    //}
+    // Check if both characters are dead to set game over state
+    if (!mario->GetAlive() && !luigi->GetAlive())
+    {
+        m_game_over = true;
+    }
 }
+
 void GameScreenLevel1::CreateKoopa(Vector2D position, FACING direction, float speed)
 {
     koopa = new CharacterKoopa(m_renderer, "Images/Koopa.png", m_level_map, position, direction, speed);
@@ -130,7 +180,7 @@ void GameScreenLevel1::CreateKoopa(Vector2D position, FACING direction, float sp
 
 bool GameScreenLevel1::SetUpLevel()
 {
-    //create background texture
+    // Create background texture
     m_background_texture = new Texture2D(m_renderer);
     m_pow_block = new PowBlock(m_renderer, m_level_map);
     m_screenshake = false;
@@ -152,6 +202,9 @@ bool GameScreenLevel1::SetUpLevel()
     mario = new CharacterMario(m_renderer, "Images/Mario.png", Vector2D(64, 300), m_level_map);
     luigi = new CharacterLuigi(m_renderer, "Images/Luigi.png", Vector2D(128, 300), m_level_map);
 
+    mario->SetAlive(true); 
+    luigi->SetAlive(true); 
+
     CreateKoopa(Vector2D(150, 30), FACING_LEFT, KOOPA_SPEED);
     CreateKoopa(Vector2D(325, 30), FACING_RIGHT, KOOPA_SPEED);
 
@@ -161,9 +214,9 @@ bool GameScreenLevel1::SetUpLevel()
     CreateCoin(Vector2D(400, 30));
     CreateCoin(Vector2D(200, 100));
     CreateCoin(Vector2D(300, 100));
+
     return true;
 }
-
 
 void GameScreenLevel1::SetLevelMap()
 {
@@ -212,17 +265,18 @@ void GameScreenLevel1::UpdateCoins(float deltaTime, SDL_Event e)
             if (Collisions::Instance()->Box(mario->GetCollisionBox(), m_coins[i]->GetCollisionBox()) ||
                 Collisions::Instance()->Box(luigi->GetCollisionBox(), m_coins[i]->GetCollisionBox()))
             {
-                // Collect the coin, add points, etc.
+                // Collect the coin, add points.
                 delete m_coins[i];
                 m_coins.erase(m_coins.begin() + i);
-                // Add points or handle collection logic here
                 m_score += 1;
                 cout << "Coin collected! Score: " << m_score << endl;
-                // Display text logic here if needed
+
             }
         }
     }
 }
+
+
 
 void GameScreenLevel1::UpdateEnemies(float deltaTime, SDL_Event e)
 {
@@ -252,7 +306,7 @@ void GameScreenLevel1::UpdateEnemies(float deltaTime, SDL_Event e)
             if ((m_enemies[i]->GetPosition().y > 300.0f || m_enemies[i]->GetPosition().y <= 64.0f) &&
                 (m_enemies[i]->GetPosition().x < 64.0f || m_enemies[i]->GetPosition().x > SCREEN_WIDTH - 96.0f))
             {
-                // Ignore collisions if behind pipe
+               
             }
             else
             {

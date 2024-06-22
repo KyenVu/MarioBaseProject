@@ -5,7 +5,7 @@ CharacterCoin::CharacterCoin(SDL_Renderer* renderer, std::string imagePath, Vect
 {
     m_frame_delay = ANIMATION_DELAY;
     m_current_frame = 0;
-    m_single_sprite_w = m_texture->GetWidth() / 3; // 3 sprites in the sheet
+    m_single_sprite_w = m_texture->GetWidth() / 3.0f; // 3 sprites in the sheet
     m_single_sprite_h = m_texture->GetHeight();
 }
 

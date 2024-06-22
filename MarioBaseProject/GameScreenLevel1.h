@@ -47,6 +47,7 @@ private:
     TTF_Font* m_font;
 
     bool m_screenshake;
+    bool m_game_over;
 
     float m_shake_time;
     float m_wobble;

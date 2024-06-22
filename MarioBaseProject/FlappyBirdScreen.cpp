@@ -16,7 +16,7 @@ FlappyBirdScreen::FlappyBirdScreen(SDL_Renderer* renderer, GameScreenManager* ma
     }
 
     // Create initial score texture
-    SDL_Color color = { 255, 255, 255, 255 }; // White color
+    SDL_Color color = { 255, 255, 255, 255 }; 
     SDL_Surface* surface = TTF_RenderText_Solid(m_font, "Score: 0", color);
     m_scoreTexture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
@@ -42,7 +42,7 @@ void FlappyBirdScreen::SetUpLevel() {
     m_bird = new CharacterBird(m_renderer, "Images/FlappyBird.png", Vector2D(100, 250));
 
     m_pipe_spawn_timer = 0.0f;
-    m_ground_level = 416.0f - 34; // Adjust ground level as needed
+    m_ground_level = 416.0f - 34; // Adjust ground level 
     m_pipe_spawn_distance = 300.0f; // Fixed distance between pipe pairs
     m_next_pipe_spawn_x = 512.0f; // Initial spawn position
 

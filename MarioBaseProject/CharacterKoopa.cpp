@@ -119,9 +119,8 @@ void CharacterKoopa::FlipRightwayUp()
 
 Rect2D CharacterKoopa::GetHeadCollisionBox()
 {
-	// Example implementation assuming enemy's head collision box size
-	// and position relative to its current position and texture size.
-	Rect2D headCollisionBox = {
+	Rect2D headCollisionBox = 
+	{
 		(float)m_position.x,
 		(float)m_position.y,
 		(float)m_texture->GetWidth(),
