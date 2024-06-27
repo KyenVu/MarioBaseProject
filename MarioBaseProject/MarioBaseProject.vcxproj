@@ -89,7 +89,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(PROJECTDIR)\SDL2\SDL\mixer_include;$(PROJECTDIR)\SDL2\SDL\image_include;$(PROJECTDIR)\SDL2\SDL\include;C:\Users\WELCOME\Downloads\BaseMarioProject-main\BaseMarioProject-main\MarioBaseProject\SDL2_ttf-2.0.15\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(PROJECTDIR)\SDL2\SDL\mixer_include;$(PROJECTDIR)\SDL2\SDL\image_include;$(PROJECTDIR)\SDL2\SDL\include;$(PROJECTDIR)\SDL2_ttf-2.0.15\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
